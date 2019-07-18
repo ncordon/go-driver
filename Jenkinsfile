@@ -67,18 +67,23 @@ spec:
         sh 'go test -run=NONE -bench=. ./driver/... | tee ${BENCHMARK_FILE}'
       }
     }
+    stage('Get git commit hash') {
+       steps {
+          script {
+            GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
+          }
+       }
+    }
     stage('Store transformations benchmark to prometheus') {
       when { branch 'jenkins-integration' }
       steps {
         sh 'cd ${DRIVER_SRC_TARGET}'
-        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
         sh '/bin/bblfsh-performance parse-and-store --language="${DRIVER_LANGUAGE}" --commit="${GIT_COMMIT_HASH}" --storage="prom" "${BENCHMARK_FILE}"'
       }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        GIT_COMMIT_HASH = sh (script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
         sh '/bin/bblfsh-performance end-to-end --language="${DRIVER_LANGUAGE}" --commit="${GIT_COMMIT_HASH}" --extension="${DRIVER_LANGUAGE_EXTENSION}" --storage="prom" "${DRIVER_SRC_FIXTURES}"'
       }
     }
