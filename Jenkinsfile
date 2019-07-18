@@ -2,10 +2,11 @@ pipeline {
   agent {
     kubernetes {
       yaml """
-metadata:
-  labels:
-    some-label: bblfsh-performance
-    class: BabelfishPerformanceTest
+# TODO(lwsanty): labels selectors TBD
+#metadata:
+#  labels:
+#    some-label: bblfsh-performance
+#    class: BabelfishPerformanceTest
 spec:
   containers:
   - name: bblfsh-performance
@@ -28,24 +29,22 @@ spec:
 """
       }
     }
-  environment {
-    GOPATH = "/go"
+    def GOPATH = "/go"
     // this name would be specific for each driver,
     // because each driver repo would have it's own Jenkinsfile
-    DRIVER_NAME = "go-driver"
-    DRIVER_LANGUAGE = "go"
-    DRIVER_LANGUAGE_EXTENSION = ".go"
-    DRIVER_REPO = "https://github.com/bblfsh/${env.DRIVER_NAME}.git"
-    DRIVER_SRC_TARGET = "/root/driver"
-    DRIVER_SRC_FIXTURES = "/root/driver/fixtures"
-    BENCHMARK_FILE = "/root/bench.log"
+    def DRIVER_NAME = "go-driver"
+    def DRIVER_LANGUAGE = "go"
+    def DRIVER_LANGUAGE_EXTENSION = ".go"
+    def DRIVER_REPO = "https://github.com/bblfsh/go-driver.git"
+    def DRIVER_SRC_TARGET = "/root/driver"
+    def DRIVER_SRC_FIXTURES = "/root/driver/fixtures"
+    def BENCHMARK_FILE = "/root/bench.log"
     // this section represents envs that required by bblfsh-performance
-    LOG_LEVEL = "debug"
+    def LOG_LEVEL = "debug"
     // address of prometheus pushgateway, prometheus pushgateway must be accessible from jenkins
-    PROM_ADDRESS = "http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
+    def PROM_ADDRESS = "http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
     // existing job in prometheus
-    PROM_JOB = "bblfsh_perfomance"
-  }
+    def PROM_JOB = "bblfsh_perfomance"
   // this is polling for every 2 minutes
   // however it's better to use trigger curl http://yourserver/jenkins/git/notifyCommit?url=<URL of the Git repository>
   // https://kohsuke.org/2011/12/01/polling-must-die-triggering-jenkins-builds-from-a-git-hook/
