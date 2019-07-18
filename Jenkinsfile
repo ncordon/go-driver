@@ -28,7 +28,6 @@ spec:
 """
       }
     }
-  }
   environment {
     GOPATH = "/go"
     // this name would be specific for each driver,
