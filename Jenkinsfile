@@ -23,28 +23,35 @@ spec:
     - name: docker-socket
       hostPath:
         path: /var/run/docker.sock
+    env:
+    - name: GOPATH
+      value: "/go"
+    - name: DRIVER_NAME
+      value: "go-driver"
+    - name: DRIVER_LANGUAGE
+      value: "go"
+    - name: DRIVER_LANGUAGE_EXTENSION
+      value: ".go"
+    - name: DRIVER_REPO
+      value: "https://github.com/bblfsh/go-driver.git"
+    - name: DRIVER_SRC_TARGET
+      value: "/root/driver"
+    - name: DRIVER_SRC_FIXTURES
+      value: "/root/driver/fixtures"
+    - name: BENCHMARK_FILE
+      value: "/root/bench.log"
+    - name: LOG_LEVEL
+      value: "debug"
+    - name: PROM_ADDRESS
+      value: "http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
+    - name: PROM_JOB
+      value: "bblfsh_perfomance"
     command:
     - cat
     tty: true
 """
       }
     }
-    def GOPATH = "/go"
-    // this name would be specific for each driver,
-    // because each driver repo would have it's own Jenkinsfile
-    def DRIVER_NAME = "go-driver"
-    def DRIVER_LANGUAGE = "go"
-    def DRIVER_LANGUAGE_EXTENSION = ".go"
-    def DRIVER_REPO = "https://github.com/bblfsh/go-driver.git"
-    def DRIVER_SRC_TARGET = "/root/driver"
-    def DRIVER_SRC_FIXTURES = "/root/driver/fixtures"
-    def BENCHMARK_FILE = "/root/bench.log"
-    // this section represents envs that required by bblfsh-performance
-    def LOG_LEVEL = "debug"
-    // address of prometheus pushgateway, prometheus pushgateway must be accessible from jenkins
-    def PROM_ADDRESS = "http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
-    // existing job in prometheus
-    def PROM_JOB = "bblfsh_perfomance"
   // this is polling for every 2 minutes
   // however it's better to use trigger curl http://yourserver/jenkins/git/notifyCommit?url=<URL of the Git repository>
   // https://kohsuke.org/2011/12/01/polling-must-die-triggering-jenkins-builds-from-a-git-hook/
