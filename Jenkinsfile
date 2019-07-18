@@ -42,9 +42,9 @@ spec:
     // this section represents envs that required by bblfsh-performance
     LOG_LEVEL = "debug"
     // address of prometheus pushgateway, prometheus pushgateway must be accessible from jenkins
-    PROM_ADDRESS="http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
+    PROM_ADDRESS = "http://prom-pushgateway-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
     // existing job in prometheus
-    PROM_JOB=bblfsh_perfomance
+    PROM_JOB = "bblfsh_perfomance"
   }
   // this is polling for every 2 minutes
   // however it's better to use trigger curl http://yourserver/jenkins/git/notifyCommit?url=<URL of the Git repository>
