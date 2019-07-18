@@ -62,7 +62,7 @@ spec:
       when { branch 'jenkins-integration' }
       steps {
         dir('${DRIVER_SRC_TARGET}') {
-          git url: '${DRIVER_REPO}'
+          checkout scm
         }
       }
     }
