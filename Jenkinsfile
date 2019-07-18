@@ -10,6 +10,7 @@ spec:
   containers:
   - name: bblfsh-performance
     image: bblfsh/performance:latest
+    imagePullPolicy: Always
     securityContext:
       privileged: true
       runAsUser: 1000
