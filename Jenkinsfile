@@ -31,6 +31,7 @@ spec:
   }
   environment {
     GOPATH = "/go"
+    PATH="${env.GOPATH}/bin:$PATH"
     DRIVER_NAME = "go-driver"
     DRIVER_LANGUAGE = "go"
     DRIVER_LANGUAGE_EXTENSION = ".go"
@@ -48,46 +49,39 @@ spec:
   // the problem is that it requires Jenkins to be accessible from the hook side
   triggers { pollSCM('H/2 * * * *') }
   stages {
-    stage('Pull') {
-      when { branch 'jenkins-integration' }
-      steps {
-        dir("${env.DRIVER_SRC_TARGET}") {
-          checkout scm
-        }
-      }
-    }
+    // stage('Pull') {
+    //   when { branch 'jenkins-integration' }
+    //   steps {
+    //     dir("${env.DRIVER_SRC_TARGET}") {
+    //       checkout scm
+    //     }
+    //   }
+    // }
     stage('Run transformations benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        dir("${env.DRIVER_SRC_TARGET}") {
-          sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
-        }
+        sh "printenv"
+        sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
       }
     }
     stage('Get git commit hash') {
        steps {
-         dir("${env.DRIVER_SRC_TARGET}") {
-           sh "git log -n 1 --pretty=format:'%H' | tee hash"
-         }
+         sh "git log -n 1 --pretty=format:'%H'"
        }
     }
     stage('Store transformations benchmark to prometheus') {
       when { branch 'jenkins-integration' }
       steps {
-        sh "cd ${env.DRIVER_SRC_TARGET}"
         sh '''
           /root/bblfsh-performance parse-and-store --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --storage=prom ${env.BENCHMARK_FILE}
         '''
-      }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        dir("${env.DRIVER_SRC_TARGET}") {
-          sh '''
-            /root/bblfsh-performance end-to-end --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --extension=${env.DRIVER_LANGUAGE_EXTENSION} --storage=prom ${env.DRIVER_SRC_FIXTURES}
-          '''
-        }
+        sh '''
+          /root/bblfsh-performance end-to-end --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --extension=${env.DRIVER_LANGUAGE_EXTENSION} --storage=prom ${env.DRIVER_SRC_FIXTURES}
+        '''
       }
     }
   }
