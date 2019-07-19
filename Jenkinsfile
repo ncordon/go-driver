@@ -75,6 +75,7 @@ spec:
         sh '''
           /root/bblfsh-performance parse-and-store --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --storage=prom ${env.BENCHMARK_FILE}
         '''
+      }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
