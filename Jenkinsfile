@@ -59,8 +59,8 @@ spec:
     stage('Run transformations benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        sh 'cd ${env.DRIVER_SRC_TARGET}'
-        sh 'go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}'
+        sh "cd ${env.DRIVER_SRC_TARGET}"
+        sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
       }
     }
     stage('Get git commit hash') {
@@ -73,7 +73,7 @@ spec:
     stage('Store transformations benchmark to prometheus') {
       when { branch 'jenkins-integration' }
       steps {
-        sh 'cd ${env.DRIVER_SRC_TARGET}'
+        sh "cd ${env.DRIVER_SRC_TARGET}"
         sh '/root/bblfsh-performance parse-and-store --language="${env.DRIVER_LANGUAGE}" --commit="${env.GIT_COMMIT_HASH}" --storage="prom" "${env.BENCHMARK_FILE}"'
       }
     }
