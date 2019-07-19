@@ -29,6 +29,7 @@ spec:
 """
     }
   }
+  // TODO use WORKSPACE /home/jenkins/workspace/sh_go-driver_jenkins-integration
   environment {
     GOPATH = "/go"
     PATH="${env.GOPATH}/bin:$PATH"
@@ -61,28 +62,21 @@ spec:
       when { branch 'jenkins-integration' }
       steps {
         sh "printenv"
+        sh "ls ${env.GOPATH}/bin/"
+        sh "go version"
         sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
       }
-    }
-    stage('Get git commit hash') {
-       steps {
-         sh "git log -n 1 --pretty=format:'%H'"
-       }
     }
     stage('Store transformations benchmark to prometheus') {
       when { branch 'jenkins-integration' }
       steps {
-        sh '''
-          /root/bblfsh-performance parse-and-store --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --storage=prom ${env.BENCHMARK_FILE}
-        '''
+        sh "/root/bblfsh-performance parse-and-store --language=${env.DRIVER_LANGUAGE} --commit=${env.GIT_COMMIT} --storage=prom ${env.BENCHMARK_FILE}"
       }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        sh '''
-          /root/bblfsh-performance end-to-end --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --extension=${env.DRIVER_LANGUAGE_EXTENSION} --storage=prom ${env.DRIVER_SRC_FIXTURES}
-        '''
+        sh "/root/bblfsh-performance end-to-end --language=${env.DRIVER_LANGUAGE} --commit=${env.GIT_COMMIT} --extension=${env.DRIVER_LANGUAGE_EXTENSION} --storage=prom ${env.DRIVER_SRC_FIXTURES}"
       }
     }
   }
