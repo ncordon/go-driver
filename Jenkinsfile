@@ -59,28 +59,31 @@ spec:
     stage('Run transformations benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        sh "cd ${env.DRIVER_SRC_TARGET}"
-        sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
+        dir('${env.DRIVER_SRC_TARGET}') {
+          sh "go test -run=NONE -bench=. ./driver/... | tee ${env.BENCHMARK_FILE}"
+        }
       }
     }
     stage('Get git commit hash') {
        steps {
-          script {
-            GIT_COMMIT_HASH = sh(script: "git log -n 1 --pretty=format:'%H'", returnStdout: true)
-          }
+         dir('${env.DRIVER_SRC_TARGET}') {
+           sh "git log -n 1 --pretty=format:'%H' | tee hash"
+         }
        }
     }
     stage('Store transformations benchmark to prometheus') {
       when { branch 'jenkins-integration' }
       steps {
         sh "cd ${env.DRIVER_SRC_TARGET}"
-        sh '/root/bblfsh-performance parse-and-store --language="${env.DRIVER_LANGUAGE}" --commit="${env.GIT_COMMIT_HASH}" --storage="prom" "${env.BENCHMARK_FILE}"'
+        sh '/root/bblfsh-performance parse-and-store --language="${env.DRIVER_LANGUAGE}" --commit="$(cat hash)" --storage="prom" "${env.BENCHMARK_FILE}"'
       }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
       steps {
-        sh '/root/bblfsh-performance end-to-end --language="${env.DRIVER_LANGUAGE}" --commit="${env.GIT_COMMIT_HASH}" --extension="${env.DRIVER_LANGUAGE_EXTENSION}" --storage="prom" "${env.DRIVER_SRC_FIXTURES}"'
+        dir('${env.DRIVER_SRC_TARGET}') {
+          sh '/root/bblfsh-performance end-to-end --language="${env.DRIVER_LANGUAGE}" --commit="$(cat hash)" --extension="${env.DRIVER_LANGUAGE_EXTENSION}" --storage="prom" "${env.DRIVER_SRC_FIXTURES}"'
+        }
       }
     }
   }
