@@ -75,14 +75,18 @@ spec:
       when { branch 'jenkins-integration' }
       steps {
         sh "cd ${env.DRIVER_SRC_TARGET}"
-        sh '/root/bblfsh-performance parse-and-store --language="${env.DRIVER_LANGUAGE}" --commit="$(cat hash)" --storage="prom" "${env.BENCHMARK_FILE}"'
+        sh '''
+          /root/bblfsh-performance parse-and-store --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --storage=prom ${env.BENCHMARK_FILE}
+        '''
       }
     }
     stage('Run end-to-end benchmark') {
       when { branch 'jenkins-integration' }
       steps {
         dir("${env.DRIVER_SRC_TARGET}") {
-          sh '/root/bblfsh-performance end-to-end --language="${env.DRIVER_LANGUAGE}" --commit="$(cat hash)" --extension="${env.DRIVER_LANGUAGE_EXTENSION}" --storage="prom" "${env.DRIVER_SRC_FIXTURES}"'
+          sh '''
+            /root/bblfsh-performance end-to-end --language=${env.DRIVER_LANGUAGE} --commit=$(cat hash) --extension=${env.DRIVER_LANGUAGE_EXTENSION} --storage=prom ${env.DRIVER_SRC_FIXTURES}
+          '''
         }
       }
     }
